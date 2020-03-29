@@ -1,5 +1,5 @@
 from csv import Error, DictReader, QUOTE_NONE
-from typing import Generator, Type, Union
+from typing import Generator, Union
 
 from common import MetadataRecord
 
@@ -39,7 +39,7 @@ def _sanitize_value(value: str) -> Union[int, str, None]:
     return int(value)
 
 
-def _perform_extraction(file_path: str) -> Generator[Type[MetadataRecord], None, None]:
+def _perform_extraction(file_path: str) -> Generator[MetadataRecord, None, None]:
     """
     Perform the extraction of records from the given CSV file.
 
@@ -72,7 +72,7 @@ def _perform_extraction(file_path: str) -> Generator[Type[MetadataRecord], None,
 
 
 @file_extractor("csv")
-def extract_data_from_csv(file_path: str) -> Generator[Type[MetadataRecord], None, None]:
+def extract_data_from_csv(file_path: str) -> Generator[MetadataRecord, None, None]:
     """
     Perform the extraction of records from the given CSV file.
 

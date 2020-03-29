@@ -3,7 +3,7 @@ This module isolates the logic to store metadata into disk.
 """
 import os
 import sqlite3
-from typing import Iterable, Type, Generator
+from typing import Iterable, Generator
 from common import Metadata
 
 
@@ -44,7 +44,7 @@ class StoreManager:
         except sqlite3.DatabaseError:
             raise StoringException("Could not create db schema. Is it a readable path?")
 
-    def store_metadata(self, file_path: str, metadata: Iterable[Type[Metadata]]) -> None:
+    def store_metadata(self, file_path: str, metadata: Iterable[Metadata]) -> None:
         """
         Store metadata into the db.
 
@@ -65,7 +65,7 @@ class StoreManager:
         except sqlite3.DatabaseError:
             raise StoringException("Could not store metadata into the DB. Is it corrupted?")
 
-    def retrieve_metadata(self, file_path: str) -> Generator[Type[Metadata], None, None]:
+    def retrieve_metadata(self, file_path: str) -> Generator[Metadata, None, None]:
         """
         Retrieve metadata from db.
 

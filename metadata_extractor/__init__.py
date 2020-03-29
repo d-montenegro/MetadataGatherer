@@ -4,7 +4,7 @@ It exposes the following:
    - extract_metadata_from_file() -> reads a given file and produces the corresponding MetadataRecords
    - ExtractionError -> the exception raised when anything goes wrong
 """
-from typing import Generator, Type
+from typing import Generator
 
 from common import MetadataRecord
 
@@ -14,7 +14,7 @@ from .exceptions import ExtractionError
 from .file_extractor import file_extractors
 
 
-def extract_metadata_from_file(file_path: str) -> Generator[Type[MetadataRecord], None, None]:
+def extract_metadata_from_file(file_path: str) -> Generator[MetadataRecord, None, None]:
     """
     Extract metadata from a given file.
 

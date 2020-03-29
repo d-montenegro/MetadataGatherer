@@ -2,7 +2,7 @@
 This module isolates the logic to summarize records provided by an arbitrary sources into
 normalized metadata.
 """
-from typing import Generator, Type, Iterable
+from typing import Generator, Iterable
 
 from common import Metadata, MetadataRecord, RECORD_TYPE_MAPPING
 
@@ -51,7 +51,7 @@ class _MetadataAggregator:
         self.occurrences += 1
 
 
-def crawl(records: Iterable[MetadataRecord]) -> Generator[Type[Metadata], None, None]:
+def crawl(records: Iterable[MetadataRecord]) -> Generator[Metadata, None, None]:
     """
     Summarize an iterable of records into normalized metadata.
 

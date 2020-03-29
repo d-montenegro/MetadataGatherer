@@ -1,4 +1,4 @@
-from typing import Generator, Type
+from typing import Generator
 import json
 
 from common import MetadataRecord
@@ -7,7 +7,7 @@ from .exceptions import ExtractionError
 from .file_extractor import file_extractor
 
 
-def _perform_extractor(file_path: str) -> Generator[Type[MetadataRecord], None, None]:
+def _perform_extractor(file_path: str) -> Generator[MetadataRecord, None, None]:
     """
     Perform the extraction of records from the given JSON file.
 
@@ -29,7 +29,7 @@ def _perform_extractor(file_path: str) -> Generator[Type[MetadataRecord], None, 
 
 
 @file_extractor("json")
-def extract_data_from_json(file_path: str) -> Generator[Type[MetadataRecord], None, None]:
+def extract_data_from_json(file_path: str) -> Generator[MetadataRecord, None, None]:
     """
     Perform the extraction of records from the given JSON file.
 
