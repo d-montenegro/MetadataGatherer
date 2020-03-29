@@ -1,0 +1,12 @@
+[{
+	"event": "impression",
+	"width": 30,
+	"height": null,
+	"client_uid": "11234"
+}, {
+	"event": null,
+	"width": 60,
+	"height": 10,
+	"client_uid": "abcdf"
+}]
+
