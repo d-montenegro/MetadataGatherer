@@ -1,12 +1,12 @@
 # MetadataGatherer
 
-A toy CLI utility to gather metadata from files in local file-system and store it in a SQL DB.
+A toy CLI utility to gather metadata from files in local file-system and store it in a SQLite DB.
 
 ## Using MetadataGatherer
 
 ### Prerequisites
 
-This utility requires Python 3.6. Although it should work in any version >= 3.0, it has been developed 
+This utility requires _Python 3.6_. Although it should work in any version >= 3.0, it has been developed
 and tested only in version 3.6.
 
 ### Usage
@@ -24,7 +24,8 @@ python gather.py -c examples/metadata.csv --database-path metadata_gather.db
 python gather.py -d examples/metadata.csv --database-path metadata_gather.db
 ```
 
-The _--database-path_ is optional, and its default value is _metadata_gather.db_.
+The _--database-path_ is optional, and its default value is _metadata_gather.db_ in the current working
+directory.
 
 ## Tests
 
@@ -41,24 +42,45 @@ pip install -r requirements_dev.txt
 pytest
 ```
 
-## Architecture
+## Design
 
-This utility has three totally uncoupled layers:
- * Metadata extraction: contains the logic to extract records from arbitrary sources. The supported ones 
- are JSON and CSV file, but can be extended in the future. It's implemented in the package 
- _metadata_extractor_ and produces list of _MetadataRecord_.
- * Crawling: contains the logic to summarize records into the metadata that needs to be stored. It's implemented
- in the module _crawler.py_, and summarizes a list of _MetadataRecord_ into _Metadata_ objects.
- * Storing: contains the logic to store metadata into a DB and retrieve them from it. It's implemented module
- _store_manager.py_, and stores and retrieves _Metadata_ objects.
+This utility has three totally uncoupled layers. The first reads data from a file and produces records. The second
+summarizes those records into normalized metadata. The third one stores that metadata into a SQLite DB.
 
-Both _MetadataRecord_ and _Metadata_ are just immutable tuples. The first one is of size, describing a field name
-and a field value. The second one is of size 4, and contains the fields _field_, _type_, _total_occurrences_ abd 
-_null_occurrences_.
+### Producing Records
+
+The logic to produce records is isolated in package _metadata_extractor_. It exposes only one function,
+_extract_metadata_from_file_, that receives the path to a local file and produces records in lazily way.
+The records are implemented as instances of _MetadataRecord_, a simple tuple of size two representing a
+pair field name - field value.
+
+There are only two file formats supported, _CSV_ and _JSON_. In order to simplify the addition of new file
+formats, an _Strategy_-like pattern is implemented with a decorator. The decorator allows the registering
+of functions into a mapping by extension, and the choice of the strategy is made internally using that mapping.
+
+### Summarizing Records
+
+The logic to perform summarizing is isolated in module _crawler.py_. It exposes only one function,
+_crawl_, that summarizes a sequence of records into normalized data. This data is represented as a
+list of _Metadata_, a tuple of size four with the following attributes:
+
+* field
+* type
+* total_occurrences
+* null_occurrences
+
+all of them are self-explanatory.
+
+### Storing Metadata
+
+The logic to store and retrieve metadata into SQLite DB is isolated in module _store_manager.py_. It
+exposes the class _MetadataStoreManager_, with two public methods:
+ * store_metadata: stores a sequence of _Metadata_ objects
+ * retrieve_metadata: retrieves a sequence of _Metadata_ objects
 
 ## Disclaimer
 
-### DB Schmea not optimum
+### DB Schema is not optimum
 The DB schema for this application consists of a single table with the following fields:
 
 * id: the primary key
@@ -68,16 +90,15 @@ The DB schema for this application consists of a single table with the following
 * total_occurrences: the total occurrences of this field
 * null_occurrences: the null occurrences of this field
 
-As it can be easily seen, the file_id value is repeated for all the fields extracted from the same source
+As it can be easily seen, the file_id value is repeated for all the fields extracted from the same source,
 which is a waste of space. This can be solved by splitting this table into two. The first must containing 
 only the file_id, and the second should contain all of the rest of the fields with foreign key to the first one.
 
 In this version of the application, the file_id is the absolute path of the file the fields were extracted
-from. To optimize space, this can be improved by translating it to a shorter form. For instance, it can 
-be encoded in base64.
+from. To optimize space, this can be improved by translating it to a shorter form.
 
 ### JSON Reader space complexity
 
 In the current version of this utility, the logic to extract metadata from JSON files needs to read the
 hole file in memory. An optimal approach should read object by object. This can be achieved by reading the
-file character by character, an getting an object when curly brackets get balanced.
+file character by character, and getting an object when curly brackets get balanced.
