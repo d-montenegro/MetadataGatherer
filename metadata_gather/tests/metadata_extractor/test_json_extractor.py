@@ -75,6 +75,15 @@ def test_json_unicode_value(temp_json_file):
     assert records == [MetadataRecord('field', '短消息')]
 
 
+def test_unexpected_json_structure(temp_json_file):
+    write_json(temp_json_file, {'field': 'value'})
+    with pytest.raises(ExtractionError) as exc:
+        list(extract_data_from_json(temp_json_file.name))
+
+    info = exc.value
+    assert info.args[0] == 'Invalid JSON structure. It must contain a list of objects'
+
+
 def test_non_json_file(temp_json_file):
     temp_json_file.write("This is a not JSON content")
     with pytest.raises(ExtractionError) as exc:

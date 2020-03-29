@@ -1,5 +1,6 @@
-from typing import Generator
+from collections.abc import Mapping
 import json
+from typing import Generator
 
 from common import MetadataRecord
 
@@ -24,6 +25,9 @@ def _perform_extractor(file_path: str) -> Generator[MetadataRecord, None, None]:
     with open(file_path, mode='r') as json_file:
         # TODO: avoid reading the hole file at once
         for obj in json.load(json_file):
+            if not isinstance(obj, Mapping):
+                raise ExtractionError(f'Invalid JSON structure. It must contain a list of objects')
+
             for key, value in obj.items():
                 yield MetadataRecord(key, value)
 
@@ -42,6 +46,8 @@ def extract_data_from_json(file_path: str) -> Generator[MetadataRecord, None, No
     """
     try:
         yield from _perform_extractor(file_path)
+    except ExtractionError:
+        raise
     except IOError:
         raise ExtractionError(f"Could not open file '{file_path}'")
     except json.JSONDecodeError:
