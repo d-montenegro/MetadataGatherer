@@ -1,4 +1,9 @@
-from store_manager import MetadataStoreManager
+import os
+from stat import S_IREAD, S_IRGRP, S_IROTH
+
+import pytest
+
+from store_manager import MetadataStoreManager, StoringException
 from common import Metadata
 
 
@@ -40,3 +45,24 @@ def test_successfully_retrieving_by_key(temp_db_file):
     assert [m1] == list(s.retrieve_metadata("abc"))
     assert [m2] == list(s.retrieve_metadata("def"))
     assert [m3] == list(s.retrieve_metadata("ghi"))
+
+
+def test_corrupted_db_file(temp_db_file):
+    temp_db_file.write("This is some content")
+    temp_db_file.flush()
+    s = MetadataStoreManager(temp_db_file.name)
+    with pytest.raises(StoringException) as exc:
+        s.store_metadata("abc", [Metadata('field_1', 'I', 10, 0)])
+
+    info = exc.value
+    assert info.args[0] == "Could not store metadata into the DB. Is it corrupted?"
+
+
+def test_non_writable_db_file(temp_db_file):
+    # set temp_db_file non-writable
+    os.chmod(temp_db_file.name, S_IREAD | S_IRGRP | S_IROTH)
+    with pytest.raises(StoringException) as exc:
+        MetadataStoreManager(temp_db_file.name)
+
+    info = exc.value
+    assert info.args[0] == "Could not create db schema. Is it a readable path?"
