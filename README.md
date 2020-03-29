@@ -1,6 +1,6 @@
 # MetadataGatherer
 
-A toy CLI utility to gather metadata from files in local file-system and store it in a SQLite DB.
+A toy CLI utility to gather metadata from files in the local file-system and store it in a SQLite DB.
 
 ## Using MetadataGatherer
 
@@ -14,18 +14,18 @@ and tested only in version 3.6.
 To run the utility, simply invoke the script _gather.py_ in _metadata_gather_ folder. See the following
 examples:
 ```bash
+
 # see help
 python gather.py -h
 
-# gather metadata from examples/metadata.csv
+# crawl metadata from examples/metadata.csv
 python gather.py -c examples/metadata.csv --database-path metadata_gather.db
 
 # describe metadata from examples/metadata.csv
 python gather.py -d examples/metadata.csv --database-path metadata_gather.db
 ```
 
-The _--database-path_ is optional, and its default value is _metadata_gather.db_ in the current working
-directory.
+The _--database-path_ is optional, defaults to _metadata_gather.db_ in the current working directory.
 
 ## Tests
 
@@ -51,18 +51,19 @@ summarizes those records into normalized metadata. The third one stores that met
 
 The logic to produce records is isolated in package _metadata_extractor_. It exposes only one function,
 _extract_metadata_from_file_, that receives the path to a local file and produces records in lazily way.
-The records are implemented as instances of _MetadataRecord_, a simple tuple of size two representing a
-pair field name - field value.
+The records are implemented as instances of _MetadataRecord_, a simple tuple of size two representing a field
+with its corresponding value.
 
-There are only two file formats supported, _CSV_ and _JSON_. In order to simplify the addition of new file
+There are only two file formats supported, _CSV_ and _JSON_. In order to simplify the addition of new
 formats, an _Strategy_-like pattern is implemented with a decorator. The decorator allows the registering
-of functions into a mapping by extension, and the choice of the strategy is made internally using that mapping.
+of functions into a mapping by extension, and the choice of the concrete strategy is made internally
+using that mapping.
 
 ### Summarizing Records
 
 The logic to perform summarizing is isolated in module _crawler.py_. It exposes only one function,
-_crawl_, that summarizes a sequence of records into normalized data. This data is represented as a
-list of _Metadata_, a tuple of size four with the following attributes:
+_crawl_, that summarizes a sequence of _MetadataRecord_ into normalized metadata. This data is represented as
+instances of _Metadata_, a tuple of size four with the following attributes:
 
 * field
 * type
@@ -73,14 +74,15 @@ all of them are self-explanatory.
 
 ### Storing Metadata
 
-The logic to store and retrieve metadata into SQLite DB is isolated in module _store_manager.py_. It
+The logic to store and retrieve normalized metadata into DB is isolated in module _store_manager.py_. It
 exposes the class _MetadataStoreManager_, with two public methods:
  * store_metadata: stores a sequence of _Metadata_ objects
  * retrieve_metadata: retrieves a sequence of _Metadata_ objects
 
-## Disclaimer
+## Optimization
 
-### DB Schema is not optimum
+### DB Schema
+
 The DB schema for this application consists of a single table with the following fields:
 
 * id: the primary key
@@ -90,15 +92,15 @@ The DB schema for this application consists of a single table with the following
 * total_occurrences: the total occurrences of this field
 * null_occurrences: the null occurrences of this field
 
-As it can be easily seen, the file_id value is repeated for all the fields extracted from the same source,
-which is a waste of space. This can be solved by splitting this table into two. The first must containing 
+As it can be easily seen, the file_id value is repeated for all the fields that belongs to the same source,
+which is a waste of space. This can be solved by splitting this table in two. The first must containing 
 only the file_id, and the second should contain all of the rest of the fields with foreign key to the first one.
 
 In this version of the application, the file_id is the absolute path of the file the fields were extracted
-from. To optimize space, this can be improved by translating it to a shorter form.
+from. To optimize space, this can be improved by encoding it to a shorter form.
 
-### JSON Reader space complexity
+### JSON Reader
 
-In the current version of this utility, the logic to extract metadata from JSON files needs to read the
+In the current version of this utility, the logic to retrieve metadata from JSON files needs to read the
 hole file in memory. An optimal approach should read object by object. This can be achieved by reading the
 file character by character, and getting an object when curly brackets get balanced.
