@@ -7,11 +7,12 @@ It exposes the following:
 from typing import Generator
 
 from common import MetadataRecord
-
-from . import csv_extractor
-from . import json_extractor
 from .exceptions import ExtractionError
 from .file_extractor import file_extractors
+
+# This imports allows the decorator to register all the allowed extractors
+from . import csv_extractor  # noqa: F401
+from . import json_extractor  # noqa: F401
 
 
 def extract_metadata_from_file(file_path: str) -> Generator[MetadataRecord, None, None]:
