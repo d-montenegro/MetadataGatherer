@@ -16,13 +16,13 @@ examples:
 ```bash
 
 # see help
-python gather.py -h
+python3.6 gather.py -h
 
 # crawl metadata from examples/metadata.csv
-python gather.py -c examples/metadata.csv --database-path metadata_gather.db
+python3.6 gather.py -c examples/metadata.csv --database-path metadata_gather.db
 
 # describe metadata from examples/metadata.csv
-python gather.py -d examples/metadata.csv --database-path metadata_gather.db
+python3.6 gather.py -d examples/metadata.csv --database-path metadata_gather.db
 ```
 
 The _--database-path_ is optional, defaults to _metadata_gather.db_ in the current working directory.
