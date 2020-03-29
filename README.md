@@ -55,15 +55,15 @@ The records are implemented as instances of _MetadataRecord_, a simple tuple of 
 with its corresponding value.
 
 There are only two file formats supported, _CSV_ and _JSON_. In order to simplify the addition of new
-formats, an _Strategy_-like pattern is implemented with a decorator. The decorator allows the registering
+formats, an _Strategy_-like pattern is implemented with a decorator. The decorator allows the registration
 of functions into a mapping by extension, and the choice of the concrete strategy is made internally
 using that mapping.
 
 ### Summarizing Records
 
-The logic to perform summarizing is isolated in module _crawler.py_. It exposes only one function,
-_crawl_, that summarizes a sequence of _MetadataRecord_ into normalized metadata. This data is represented as
-instances of _Metadata_, a tuple of size four with the following attributes:
+The logic to perform record summarizing is isolated in module _crawler.py_. It exposes only one function,
+_crawl_, that receives a sequence of _MetadataRecord_ and produce normalized metadata. This metadata is
+represented as instances of _Metadata_, a tuple of size four with the following attributes:
 
 * field
 * type
