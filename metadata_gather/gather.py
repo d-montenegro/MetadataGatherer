@@ -101,7 +101,8 @@ def main():
     group = parser.add_mutually_exclusive_group(required=True)
 
     group.add_argument('-c', '--crawl', metavar='FILE_PATH',
-                       type=readable_file, help='metadata file to process')
+                       type=readable_file, help='metadata file to process. Allowed extensions '
+                                                'are "csv" and "json"')
     group.add_argument('-d', '--describe', metavar='FILE_PATH',
                        type=absolute_path, help='metadata file to describe')
 
