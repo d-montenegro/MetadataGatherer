@@ -11,7 +11,7 @@ and tested only in version 3.6.
 
 ### Usage
 
-To run the utility, simply invoke the script _gather.py_ in _metadata_gather_ folder. See the following
+To run the utility, simply invoke the python script _gather.py_ in _metadata_gather_ folder. See the following
 examples:
 ```bash
 
@@ -33,7 +33,7 @@ Running the test is straightforward. Although is not mandatory, it's advised to 
 dedicated to this project.
 ```bash
 python3.6 -m venv ~/.virtualenvs/metadata_gather # create a virtualenv in the desired destination
-source ~/.virtualenvs/metadata_gather/bin/activate # activate the new virtual env way
+source ~/.virtualenvs/metadata_gather/bin/activate # activate the new virtual env
 ```
 Now, you can install all the dependencies for the project using pip and run the tests in the following way.
 ```bash
@@ -92,9 +92,9 @@ The DB schema for this application consists of a single table with the following
 * total_occurrences: the total occurrences of this field
 * null_occurrences: the null occurrences of this field
 
-As it can be easily seen, the file_id value is repeated for all the fields that belongs to the same source,
+As it can be easily seen, _file_id_ is repeated for all the fields that belongs to the same source,
 which is a waste of space. This can be solved by splitting this table in two. The first must containing 
-only the file_id, and the second should contain all of the rest of the fields with foreign key to the first one.
+only the file_id, and the second should contain all other columns plus a foreign key to the first one.
 
 In this version of the application, the file_id is the absolute path of the file the fields were extracted
 from. To optimize space, this can be improved by encoding it to a shorter form.
