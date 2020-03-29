@@ -5,7 +5,7 @@ from typing import List, Type
 
 from metadata_extractor import extract_metadata_from_file, ExtractionError
 from crawler import crawl, CrawlingError
-from store_manager import StoreManager, StoringException
+from store_manager import MetadataStoreManager, StoringException
 from common import Metadata, RECORD_TYPE_NAME
 
 
@@ -33,7 +33,7 @@ def readable_file(file_path: str) -> str:
     raise argparse.ArgumentTypeError(f"The entered path '{file_path}' is not readable")
 
 
-def is_already_crawled(store_manager: StoreManager, file_path: str) -> bool:
+def is_already_crawled(store_manager: MetadataStoreManager, file_path: str) -> bool:
     """
     Whether a given file was already crawled
 
@@ -56,7 +56,7 @@ def perform_crawling(abs_path: str, db_path: str) -> None:
     :param abs_path: the file to extract metadata from
     :param db_path: path to the store file. It's created if it doesn't exists.
     """
-    s = StoreManager(db_path)
+    s = MetadataStoreManager(db_path)
     if is_already_crawled(s, abs_path):
         print(f"File '{abs_path}' already crawled", file=sys.stderr)
         sys.exit(1)
@@ -73,7 +73,7 @@ def perform_describe(abs_path: str, db_path: str) -> None:
     :param abs_path: the file the metadata was extracted from
     :param db_path: path to the store file. It's created if it doesn't exists.
     """
-    s = StoreManager(db_path)
+    s = MetadataStoreManager(db_path)
     metadata = list(s.retrieve_metadata(abs_path))
     if not metadata:
         print('Could not find metadata for the entered path', file=sys.stderr)

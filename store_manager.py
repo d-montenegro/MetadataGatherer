@@ -14,7 +14,7 @@ class StoringException(Exception):
     pass
 
 
-class StoreManager:
+class MetadataStoreManager:
     """
     Provides the logic to store metadata into the DB and retrieve it as well
     """
