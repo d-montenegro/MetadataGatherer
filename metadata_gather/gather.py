@@ -5,7 +5,7 @@ from typing import List, Type
 
 from metadata_extractor import extract_metadata_from_file, ExtractionError
 from crawler import crawl, CrawlingError
-from store_manager import MetadataStoreManager, StoringException
+from storage_manager import MetadataStorageManager, StoringException
 from common import Metadata, get_human_friendly_type
 
 
@@ -33,16 +33,16 @@ def readable_file(file_path: str) -> str:
     raise argparse.ArgumentTypeError(f"The entered path '{file_path}' is not readable")
 
 
-def is_already_crawled(store_manager: MetadataStoreManager, file_path: str) -> bool:
+def is_already_crawled(storage_manager: MetadataStorageManager, file_path: str) -> bool:
     """
     Whether a given file was already crawled
 
-    :param store_manager: an instance of the store manager to check metadata
+    :param storage_manager: an instance of the storage manager to check metadata
     :param file_path: a path
     :return: True if that file was already crawled. False otherwise.
     """
     try:
-        next(store_manager.retrieve_metadata(file_path))
+        next(storage_manager.retrieve_metadata(file_path))
     except StopIteration:
         return False
     else:
@@ -54,9 +54,9 @@ def perform_crawling(abs_path: str, db_path: str) -> None:
     Extract metadata from abs_path and store it.
 
     :param abs_path: the file to extract metadata from
-    :param db_path: path to the store file. It's created if it doesn't exists.
+    :param db_path: path to the db file. It's created if it doesn't exists.
     """
-    s = MetadataStoreManager(db_path)
+    s = MetadataStorageManager(db_path)
     if is_already_crawled(s, abs_path):
         print(f"File '{abs_path}' already crawled", file=sys.stderr)
         sys.exit(1)
@@ -71,9 +71,9 @@ def perform_describe(abs_path: str, db_path: str) -> None:
     Print metadata extracted from a given source file.
 
     :param abs_path: the file the metadata was extracted from
-    :param db_path: path to the store file. It's created if it doesn't exists.
+    :param db_path: path to the db file. It's created if it doesn't exists.
     """
-    s = MetadataStoreManager(db_path)
+    s = MetadataStorageManager(db_path)
     metadata = list(s.retrieve_metadata(abs_path))
     if not metadata:
         print('Could not find metadata for the entered path', file=sys.stderr)

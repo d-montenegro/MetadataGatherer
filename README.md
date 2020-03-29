@@ -74,8 +74,8 @@ all of them are self-explanatory.
 
 ### Storing Metadata
 
-The logic to store and retrieve normalized metadata into DB is isolated in module _store_manager.py_. It
-exposes the class _MetadataStoreManager_, with two public methods:
+The logic to store and retrieve normalized metadata into DB is isolated in module _storage_manager.py_. It
+exposes the class _MetadataStorageManager_, with two public methods:
  * store_metadata: stores a sequence of _Metadata_ objects
  * retrieve_metadata: retrieves a sequence of _Metadata_ objects
 
