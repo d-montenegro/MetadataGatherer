@@ -9,19 +9,38 @@ from store_manager import StoreManager, StoringException
 from common import Metadata, RECORD_TYPE_NAME
 
 
-def readable_file(file_path):
-    abs_path = os.path.abspath(os.path.expanduser(file_path))
+def absolute_path(file_path: str) -> str:
+    """
+    Return the absolute path for a given relative path
+    :param file_path: a relative path
+    :return: the absolute path corresponding to that relative path
+    """
+    return os.path.abspath(os.path.expanduser(file_path))
+
+
+def readable_file(file_path: str) -> str:
+    """
+    Check if a given file path is readable.
+
+    :param file_path: the path to check
+    :return the absolute path
+    :raises ArgumentTypeError if the given path is not readable
+    """
+    abs_path = absolute_path(file_path)
     if os.access(abs_path, os.R_OK):
         return abs_path
 
     raise argparse.ArgumentTypeError(f"The entered path '{file_path}' is not readable")
 
 
-def full_path(file_path):
-    return os.path.abspath(os.path.expanduser(file_path))
+def is_already_crawled(store_manager: StoreManager, file_path: str) -> bool:
+    """
+    Whether a given file was already crawled
 
-
-def is_already_crawled(store_manager, file_path):
+    :param store_manager: an instance of the store manager to check metadata
+    :param file_path: a path
+    :return: True if that file was already crawled. False otherwise.
+    """
     try:
         next(store_manager.retrieve_metadata(file_path))
     except StopIteration:
@@ -30,7 +49,13 @@ def is_already_crawled(store_manager, file_path):
         return True
 
 
-def perform_crawling(abs_path, db_path):
+def perform_crawling(abs_path: str, db_path: str) -> None:
+    """
+    Extract metadata from abs_path and store it.
+
+    :param abs_path: the file to extract metadata from
+    :param db_path: path to the store file. It's created if it doesn't exists.
+    """
     s = StoreManager(db_path)
     if is_already_crawled(s, abs_path):
         print(f"File '{abs_path}' already crawled", file=sys.stderr)
@@ -41,7 +66,13 @@ def perform_crawling(abs_path, db_path):
     s.store_metadata(abs_path, crawled_data)
 
 
-def perform_describe(abs_path, db_path):
+def perform_describe(abs_path: str, db_path: str) -> None:
+    """
+    Print metadata extracted from a given source file.
+
+    :param abs_path: the file the metadata was extracted from
+    :param db_path: path to the store file. It's created if it doesn't exists.
+    """
     s = StoreManager(db_path)
     metadata = list(s.retrieve_metadata(abs_path))
     if not metadata:
@@ -51,6 +82,12 @@ def perform_describe(abs_path, db_path):
 
 
 def pretty_print(abs_path: str, metadata: List[Type[Metadata]]) -> None:
+    """
+    Print a list of metadata objects
+
+    :param abs_path: the file the metadata was extracted from
+    :param metadata: the list of registries to print
+    """
     print(f'File: {abs_path}')
     print(f'Total entries: {len(metadata)}')
     print('Fields:')
@@ -66,10 +103,10 @@ def main():
     group.add_argument('-c', '--crawl', metavar='FILE_PATH',
                        type=readable_file, help='metadata file to process')
     group.add_argument('-d', '--describe', metavar='FILE_PATH',
-                       type=full_path, help='metadata file to describe')
+                       type=absolute_path, help='metadata file to describe')
 
     parser.add_argument('--database-path', default='metadata_gather.db',
-                        type=full_path,
+                        type=absolute_path,
                         help="The database path, metadata_gather.db in your current"
                              "working directory by default")
 
