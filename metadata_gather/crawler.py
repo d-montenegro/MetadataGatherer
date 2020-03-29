@@ -4,7 +4,7 @@ normalized metadata.
 """
 from typing import Generator, Iterable
 
-from common import Metadata, MetadataRecord, RECORD_TYPE_MAPPING
+from common import Metadata, MetadataRecord, get_internal_type
 
 
 class CrawlingError(Exception):
@@ -35,8 +35,8 @@ class _MetadataAggregator:
     @type.setter
     def type(self, t):
         try:
-            t = RECORD_TYPE_MAPPING[t]
-        except KeyError:
+            t = get_internal_type(t)
+        except ValueError:
             raise CrawlingError(f"The type of field '{self.field_name}' is unknown")
 
         if self.type_ is None:

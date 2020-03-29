@@ -6,7 +6,7 @@ from typing import List, Type
 from metadata_extractor import extract_metadata_from_file, ExtractionError
 from crawler import crawl, CrawlingError
 from store_manager import MetadataStoreManager, StoringException
-from common import Metadata, RECORD_TYPE_NAME
+from common import Metadata, get_human_friendly_type
 
 
 def absolute_path(file_path: str) -> str:
@@ -92,7 +92,7 @@ def pretty_print(abs_path: str, metadata: List[Type[Metadata]]) -> None:
     print(f'Total entries: {len(metadata)}')
     print('Fields:')
     for m in metadata:
-        print(f'\t{m.field}, {RECORD_TYPE_NAME[m.type]}, '
+        print(f'\t{m.field}, {get_human_friendly_type(m.type)}, '
               f'{m.total_occurrences - m.null_occurrences}, {m.null_occurrences}')
 
 
